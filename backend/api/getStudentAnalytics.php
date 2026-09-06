@@ -6,7 +6,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 include "db.php";
 
-$id = $_GET['id'];
+$id = (int)$_GET['id'];
 
 $sql = "SELECT * FROM students WHERE id=$id";
 $student = mysqli_fetch_assoc(mysqli_query($conn, $sql));
@@ -17,56 +17,51 @@ if (!$student) {
     exit;
 }
 
-// all subjects with this student's marks and attendance (null if not entered yet)
+// one query fetches every subject plus this student's marks and attendance (null if not entered yet)
+$sql = "SELECT sub.id, sub.code, sub.name,
+               m.internal_1, m.internal_2, m.assignment,
+               a.total_classes, a.present_classes
+        FROM subjects sub
+        LEFT JOIN marks m ON m.subject_id = sub.id AND m.student_id = $id
+        LEFT JOIN attendance a ON a.subject_id = sub.id AND a.student_id = $id
+        ORDER BY sub.id";
+
 $subjects = [];
-$result = mysqli_query($conn, "SELECT * FROM subjects ORDER BY id");
 
-while ($sub = mysqli_fetch_assoc($result)) {
-
-    $marksSql = "SELECT * FROM marks WHERE student_id=$id AND subject_id=" . $sub['id'];
-    $mark = mysqli_fetch_assoc(mysqli_query($conn, $marksSql));
-
-    $attSql = "SELECT * FROM attendance WHERE student_id=$id AND subject_id=" . $sub['id'];
-    $att = mysqli_fetch_assoc(mysqli_query($conn, $attSql));
+$result = mysqli_query($conn, $sql);
+while ($row = mysqli_fetch_assoc($result)) {
 
     $avgMarks = null;
-    if ($mark) {
-        $avgMarks = round(($mark['internal_1'] + $mark['internal_2'] + $mark['assignment']) / 3, 2);
+    if ($row['internal_1'] !== null) {
+        $avgMarks = round(($row['internal_1'] + $row['internal_2'] + $row['assignment']) / 3, 2);
     }
 
     $attendancePct = null;
-    if ($att && $att['total_classes'] > 0) {
-        $attendancePct = round(($att['present_classes'] / $att['total_classes']) * 100, 2);
+    if ($row['total_classes'] !== null && $row['total_classes'] > 0) {
+        $attendancePct = round(($row['present_classes'] / $row['total_classes']) * 100, 2);
     }
 
     $subjects[] = [
-        "id" => $sub['id'],
-        "code" => $sub['code'],
-        "name" => $sub['name'],
+        "id" => $row['id'],
+        "code" => $row['code'],
+        "name" => $row['name'],
         "marks" => $avgMarks,
         "attendance" => $attendancePct
     ];
 }
 
 // overall averages (only count subjects that have data)
-$marksSum = 0;
-$marksCount = 0;
-$attSum = 0;
-$attCount = 0;
-
-foreach ($subjects as $row) {
-    if ($row['marks'] !== null) {
-        $marksSum += $row['marks'];
-        $marksCount++;
-    }
-    if ($row['attendance'] !== null) {
-        $attSum += $row['attendance'];
-        $attCount++;
-    }
+$averageMarks = 0;
+$row = mysqli_fetch_row(mysqli_query($conn, "SELECT AVG((internal_1 + internal_2 + assignment) / 3) FROM marks WHERE student_id = $id"));
+if ($row[0] !== null) {
+    $averageMarks = round((float)$row[0], 2);
 }
 
-$averageMarks = $marksCount > 0 ? round($marksSum / $marksCount, 2) : 0;
-$averageAttendance = $attCount > 0 ? round($attSum / $attCount, 2) : 0;
+$averageAttendance = 0;
+$row = mysqli_fetch_row(mysqli_query($conn, "SELECT AVG(present_classes / total_classes * 100) FROM attendance WHERE student_id = $id AND total_classes > 0"));
+if ($row[0] !== null) {
+    $averageAttendance = round((float)$row[0], 2);
+}
 
 echo json_encode([
     "student" => [
