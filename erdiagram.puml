@@ -1,0 +1,151 @@
+@startuml
+' ==============================================================================
+' Project: EduAnalytics - Student Performance Analytics System
+' Diagram: Entity-Relationship Diagram (Crow's Foot Relational Notation)
+' Author: Project Engineering Team
+' ==============================================================================
+
+' Formatting & Skinparam settings
+hide circle
+skinparam linetype ortho
+skinparam roundCorner 8
+skinparam shadowing true
+skinparam defaultFontName "Segoe UI", Arial, sans-serif
+skinparam defaultFontSize 12
+
+skinparam title {
+    FontSize 18
+    FontStyle bold
+    FontColor #1A365D
+}
+
+skinparam entity {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    HeaderBackgroundColor #2B6CB0
+    FontColor #1A202C
+    BorderThickness 1.5
+    FontSize 12
+}
+
+skinparam note {
+    BackgroundColor #FEFCBF
+    BorderColor #B7791F
+    FontColor #744210
+    FontSize 11
+}
+
+skinparam arrow {
+    Color #2D3748
+    FontColor #2D3748
+    FontSize 11
+}
+
+title **EduAnalytics Database — Entity-Relationship Diagram (ERD)**
+
+' ==============================================================================
+' Entities Definition
+' ==============================================================================
+
+entity "**users**" as users {
+    * **id** : INT [PK, AI]
+    --
+    * **name** : VARCHAR(100)
+    * **email** : VARCHAR(150) [UQ]
+    * **password** : VARCHAR(255)
+    * **role** : VARCHAR(20) = 'admin'
+    * **created_at** : TIMESTAMP
+}
+
+entity "**students**" as students {
+    * **id** : INT [PK, AI]
+    --
+    * **student_id** : VARCHAR(20) [UQ]
+    * **name** : VARCHAR(100)
+      **email** : VARCHAR(150) [NULL]
+      **phone** : VARCHAR(20) [NULL]
+      **course** : VARCHAR(50) [NULL]
+      **semester** : INT [NULL]
+    * **created_at** : TIMESTAMP
+}
+
+entity "**subjects**" as subjects {
+    * **id** : INT [PK, AI]
+    --
+    * **code** : VARCHAR(20) [UQ]
+    * **name** : VARCHAR(100)
+}
+
+entity "**marks**" as marks {
+    * **id** : INT [PK, AI]
+    --
+    # **student_id** : INT [FK]
+    # **subject_id** : INT [FK]
+    * **internal_1** : DECIMAL(5,2) = 0.00
+    * **internal_2** : DECIMAL(5,2) = 0.00
+    * **assignment** : DECIMAL(5,2) = 0.00
+}
+
+entity "**attendance**" as attendance {
+    * **id** : INT [PK, AI]
+    --
+    # **student_id** : INT [FK]
+    # **subject_id** : INT [FK]
+    * **total_classes** : INT = 0
+    * **present_classes** : INT = 0
+}
+
+' ==============================================================================
+' Relationships (Crow's Foot Cardinalities)
+' ==============================================================================
+
+' Student to Marks & Attendance (1 to 0..*)
+students ||--o{ marks : "earns / evaluated in\n[ON DELETE CASCADE]"
+students ||--o{ attendance : "logs / recorded in\n[ON DELETE CASCADE]"
+
+' Subject to Marks & Attendance (1 to 0..*)
+subjects ||--o{ marks : "assesses / categorized under\n[ON DELETE CASCADE]"
+subjects ||--o{ attendance : "tracks / conducted for\n[ON DELETE CASCADE]"
+
+' Role-based System Administrative Management (Logical association)
+users ..o{ students : "manages (Admin)"
+users ..o{ subjects : "manages (Admin)"
+users ..o{ marks : "evaluates (Admin)"
+users ..o{ attendance : "records (Admin)"
+
+' ==============================================================================
+' Architectural & Business Rule Notes
+' ==============================================================================
+
+note right of marks
+  **Composite Business Key:**
+  UNIQUE(student_id, subject_id)
+  
+  **Calculated Average:**
+  avg = (internal_1 + internal_2 + assignment) / 3
+
+  **Referential Integrity:**
+  ON DELETE CASCADE: If a student or subject
+  is deleted, associated marks are purged.
+end note
+
+note right of attendance
+  **Composite Business Key:**
+  UNIQUE(student_id, subject_id)
+
+  **Calculated Metric:**
+  attendance_pct = (present_classes / total_classes) * 100
+  Status: >= 75% -> "Good", < 75% -> "Low"
+
+  **Referential Integrity:**
+  ON DELETE CASCADE ensures no orphaned attendance.
+end note
+
+note top of users
+  **Access Control:**
+  - 'admin': Full CRUD + User Role Management
+  - 'user': View-only + PDF Result Generation
+  - Password stored as bcrypt ($2y$10$...) hash.
+end note
+
+@enduml

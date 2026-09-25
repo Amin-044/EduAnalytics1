@@ -1,0 +1,224 @@
+@startuml
+' ==============================================================================
+' Project: EduAnalytics - Student Performance Analytics System
+' Diagram: UML Use Case Diagram (IEEE 1471 / UML 2.5 Standard)
+' Author: Project Engineering Team
+' ==============================================================================
+
+left to right direction
+
+' --- Styling & Skin Parameters ---
+skinparam monochrome false
+skinparam packageStyle rectangle
+skinparam shadowing true
+skinparam roundCorner 8
+skinparam defaultFontName "Segoe UI", Arial, sans-serif
+skinparam defaultFontSize 12
+
+skinparam title {
+    FontSize 18
+    FontStyle bold
+    FontColor #1A365D
+    BorderRoundCorner 8
+}
+
+skinparam actor {
+    BackgroundColor #2B6CB0
+    BorderColor #1A365D
+    FontColor #1A365D
+    FontStyle bold
+}
+
+skinparam rectangle {
+    BorderColor #4A5568
+    FontColor #2D3748
+    FontStyle bold
+    BackgroundColor #F7FAFC
+}
+
+skinparam usecase {
+    BackgroundColor #FFFFFF
+    BorderColor #2B6CB0
+    FontColor #1A202C
+    ArrowColor #2D3748
+    BorderThickness 1.2
+}
+
+skinparam note {
+    BackgroundColor #FEFCBF
+    BorderColor #B7791F
+    FontColor #744210
+    FontSize 11
+}
+
+title **EduAnalytics System — UML Use Case Diagram**
+
+' ==============================================================================
+' System Boundary
+' ==============================================================================
+rectangle "EduAnalytics Web Application" as EduSystem {
+
+    ' ----- Module 1: Authentication & Access Control -----
+    rectangle "1. Authentication & Security" as SecSubsystem {
+        usecase "Sign Up / Register" as UC_Signup
+        usecase "Authenticate / Login" as UC_Login
+        usecase "Verify Credentials & Role" as UC_VerifyAuth
+        usecase "Logout & Terminate Session" as UC_Logout
+    }
+
+    ' ----- Module 2: Dashboard & Overview Analytics -----
+    rectangle "2. Dashboard & Performance Metrics" as DashSubsystem {
+        usecase "View Analytics Dashboard" as UC_ViewDashboard
+        usecase "View Key Metrics (KPIs)" as UC_ViewKPIs
+        usecase "View Visual Charts (Distributions & Averages)" as UC_ViewCharts
+    }
+
+    ' ----- Module 3: Student Directory & Profiling -----
+    rectangle "3. Student Information Management" as StudentSubsystem {
+        usecase "View Student Directory" as UC_ViewStudents
+        usecase "Search / Filter Students" as UC_SearchStudent
+        usecase "Add New Student Record" as UC_AddStudent
+        usecase "Update Student Information" as UC_UpdateStudent
+        usecase "Delete Student Record" as UC_DeleteStudent
+    }
+
+    ' ----- Module 4: Curriculum & Subject Catalog -----
+    rectangle "4. Subject Catalog Management" as SubjectSubsystem {
+        usecase "View Subject Catalog" as UC_ViewSubjects
+        usecase "Add New Subject" as UC_AddSubject
+        usecase "Update Subject Details" as UC_UpdateSubject
+        usecase "Delete Subject" as UC_DeleteSubject
+    }
+
+    ' ----- Module 5: Continuous Internal Evaluation (Marks) -----
+    rectangle "5. Academic Marks Evaluation" as MarksSubsystem {
+        usecase "View Marks Records" as UC_ViewMarks
+        usecase "Enter Student Marks" as UC_EnterMarks
+        usecase "Update Marks" as UC_UpdateMarks
+        usecase "Delete Marks Record" as UC_DeleteMarks
+        usecase "Compute Subject Average" as UC_ComputeMarksAvg
+    }
+
+    ' ----- Module 6: Attendance Tracking & Monitoring -----
+    rectangle "6. Attendance Monitoring" as AttSubsystem {
+        usecase "View Attendance Records" as UC_ViewAttendance
+        usecase "Record Attendance" as UC_EnterAttendance
+        usecase "Update Attendance Record" as UC_UpdateAttendance
+        usecase "Delete Attendance Record" as UC_DeleteAttendance
+        usecase "Calculate Attendance Percentage" as UC_CalcAttendancePct
+    }
+
+    ' ----- Module 7: Deep Analytics & Result Generation -----
+    rectangle "7. Student Analytics & Result Reporting" as ReportSubsystem {
+        usecase "View Individual Student Analytics" as UC_ViewStudentAnalytics
+        usecase "View Comprehensive Results Table" as UC_ViewResults
+        usecase "Determine Grade & Pass/Fail Status" as UC_DetermineGrade
+        usecase "Generate & Download Official Result PDF" as UC_ExportPDF
+    }
+
+    ' ----- Module 8: System Administration -----
+    rectangle "8. System Administration" as AdminSubsystem {
+        usecase "View Registered Users" as UC_ViewUsers
+        usecase "Modify User Role (Admin / User)" as UC_ManageRoles
+        usecase "Delete User Account" as UC_DeleteUser
+    }
+}
+
+' ==============================================================================
+' Primary Actors and Generalization
+' ==============================================================================
+actor "User\n(Student / Faculty / Viewer)" as UserActor
+actor "System Administrator\n(Admin)" as AdminActor
+
+' Actor Generalization: Admin inherits all viewer capabilities from User
+AdminActor -up-|> UserActor
+
+' ==============================================================================
+' Actor to Use Case Associations
+' ==============================================================================
+
+' --- User (Viewer) Permissions ---
+UserActor --> UC_Signup
+UserActor --> UC_Login
+UserActor --> UC_Logout
+UserActor --> UC_ViewDashboard
+UserActor --> UC_ViewStudents
+UserActor --> UC_ViewSubjects
+UserActor --> UC_ViewMarks
+UserActor --> UC_ViewAttendance
+UserActor --> UC_ViewStudentAnalytics
+UserActor --> UC_ViewResults
+
+' --- Admin Privileged Operations ---
+AdminActor --> UC_AddStudent
+AdminActor --> UC_UpdateStudent
+AdminActor --> UC_DeleteStudent
+
+AdminActor --> UC_AddSubject
+AdminActor --> UC_UpdateSubject
+AdminActor --> UC_DeleteSubject
+
+AdminActor --> UC_EnterMarks
+AdminActor --> UC_UpdateMarks
+AdminActor --> UC_DeleteMarks
+
+AdminActor --> UC_EnterAttendance
+AdminActor --> UC_UpdateAttendance
+AdminActor --> UC_DeleteAttendance
+
+AdminActor --> UC_ViewUsers
+AdminActor --> UC_ManageRoles
+AdminActor --> UC_DeleteUser
+
+' ==============================================================================
+' UML Stereotype Dependencies (<<include>> and <<extend>>)
+' ==============================================================================
+
+' Authentication Includes
+UC_Login ..> UC_VerifyAuth : <<include>>
+
+' Dashboard Includes
+UC_ViewDashboard ..> UC_ViewKPIs : <<include>>
+UC_ViewDashboard ..> UC_ViewCharts : <<include>>
+
+' Student Search Extension
+UC_SearchStudent .up.> UC_ViewStudents : <<extend>>
+
+' Marks Calculation Include
+UC_EnterMarks ..> UC_ComputeMarksAvg : <<include>>
+UC_UpdateMarks ..> UC_ComputeMarksAvg : <<include>>
+
+' Attendance Calculation Include
+UC_EnterAttendance ..> UC_CalcAttendancePct : <<include>>
+UC_UpdateAttendance ..> UC_CalcAttendancePct : <<include>>
+
+' Analytics & Results Evaluation
+UC_ViewStudentAnalytics ..> UC_ComputeMarksAvg : <<include>>
+UC_ViewStudentAnalytics ..> UC_CalcAttendancePct : <<include>>
+
+UC_ViewResults ..> UC_DetermineGrade : <<include>>
+
+' Result PDF Export as an Optional Extension
+UC_ExportPDF .up.> UC_ViewResults : <<extend>>
+
+' ==============================================================================
+' Explanatory Engineering Notes
+' ==============================================================================
+note top of AdminActor
+  **Role-Based Access Control (RBAC)**
+  The Administrator inherits all capabilities
+  of a standard User (Inheritance relationship:
+  Admin specializes User), plus exclusive CRUD
+  privileges on academic records & role grants.
+end note
+
+note bottom of ReportSubsystem
+  **Grading Criteria:**
+  - Excellent: Avg >= 75%
+  - Good: 60% <= Avg < 75%
+  - Needs Improvement: 40% <= Avg < 60%
+  - Poor (Fail): Avg < 40%
+  - Attendance Status: >= 75% is Good, else Low
+end note
+
+@enduml
