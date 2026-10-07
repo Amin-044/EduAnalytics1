@@ -113,7 +113,7 @@ export const StudentAnalyticsPage = () => {
                 <YAxis domain={[0, 100]} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="marks" fill="#0d6efd" name="Marks %" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="marks" fill="#6366f1" name="Marks %" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}

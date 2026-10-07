@@ -24,7 +24,7 @@ export const DashboardPage = () => {
     return <DashboardLayout><p>Loading dashboard...</p></DashboardLayout>
   }
 
-  const pieColors = ['#198754', '#dc3545']
+  const pieColors = ['#10b981', '#f43f5e']
 
   return (
     <DashboardLayout>
@@ -52,7 +52,7 @@ export const DashboardPage = () => {
                     <XAxis dataKey="subject" />
                     <YAxis domain={[0, 100]} />
                     <Tooltip />
-                    <Bar dataKey="average" fill="#0d6efd" name="Avg Marks" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="average" fill="#6366f1" name="Avg Marks" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -110,7 +110,7 @@ export const DashboardPage = () => {
                 <YAxis domain={[0, 100]} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="average" fill="#198754" name="Avg Marks" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="average" fill="#7c3aed" name="Avg Marks" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}

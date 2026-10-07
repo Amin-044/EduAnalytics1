@@ -33,7 +33,7 @@ export const SignupPage = () => {
   }
 
   return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div className="auth-page min-vh-100 d-flex align-items-center justify-content-center bg-light">
       <div className="card shadow p-4 w-100" style={{ maxWidth: '400px' }}>
         <h3 className="text-center mb-1">Education Analytics</h3>
         <p className="text-center text-muted mb-4">Create a new account</p>
