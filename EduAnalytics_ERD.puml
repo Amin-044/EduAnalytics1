@@ -1,0 +1,69 @@
+@startuml EduAnalytics_ERD
+title EduAnalytics - Student Performance Analytics System\nEntity Relationship Diagram
+
+' Use ERD notation
+entity USERS {
+  *id : INT <<PK, AI>>
+  --
+  *name : VARCHAR(100)
+  *email : VARCHAR(150) <<UNIQUE>>
+  *password : VARCHAR(255)
+  *role : VARCHAR(20) <<DEFAULT 'admin'>>
+  created_at : TIMESTAMP
+}
+
+entity STUDENTS {
+  *id : INT <<PK, AI>>
+  --
+  *student_id : VARCHAR(20) <<UNIQUE>>
+  *name : VARCHAR(100)
+  email : VARCHAR(150)
+  phone : VARCHAR(20)
+  course : VARCHAR(50)
+  semester : INT
+  created_at : TIMESTAMP
+}
+
+entity SUBJECTS {
+  *id : INT <<PK, AI>>
+  --
+  *code : VARCHAR(20) <<UNIQUE>>
+  *name : VARCHAR(100)
+}
+
+entity MARKS {
+  *id : INT <<PK, AI>>
+  --
+  *student_id : INT <<FK>>
+  *subject_id : INT <<FK>>
+  internal_1 : DECIMAL(5,2)
+  internal_2 : DECIMAL(5,2)
+  assignment : DECIMAL(5,2)
+}
+
+entity ATTENDANCE {
+  *id : INT <<PK, AI>>
+  --
+  *student_id : INT <<FK>>
+  *subject_id : INT <<FK>>
+  total_classes : INT
+  present_classes : INT
+}
+
+USERS ||--o{ STUDENTS : "manages"
+STUDENTS ||--o{ MARKS : "scores"
+STUDENTS ||--o{ ATTENDANCE : "has"
+SUBJECTS ||--o{ MARKS : "awarded_in"
+SUBJECTS ||--o{ ATTENDANCE : "tracked_for"
+
+note top of MARKS
+  Average = (internal_1 + internal_2 + assignment) / 3
+  Grade based on average
+end note
+
+note top of ATTENDANCE
+  Percentage = (present_classes / total_classes) * 100
+  Status: Good >= 75%, Low < 75%
+end note
+
+@enduml
