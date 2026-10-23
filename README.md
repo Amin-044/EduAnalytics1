@@ -76,4 +76,4 @@ npm run build   # outputs to dist/
 - **Admin** — full rights: add/edit/delete students, subjects, marks, attendance and manage user roles.
 - **User** — view-only access plus downloading results, without being able to modify any data.
 
-Hashes are stored in `users.password` (bcrypt). New accounts created through the signup page automatically get the `user` role.
+Passwords are stored as plain text in `users.password`. New accounts created through the signup page automatically get the `user` role.

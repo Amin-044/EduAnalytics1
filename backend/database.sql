@@ -63,11 +63,11 @@ CREATE TABLE attendance (
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
 
--- password = "password" (bcrypt hash)
+-- password = "password"
 -- admin = full rights (add/edit/delete), user = view only + download results
 INSERT INTO users (name, email, password, role) VALUES
-('Admin', 'admin@example.com', '$2y$10$RBq8IoeWne0aZniCvz13ouGzp.yowoSoU.VVMVWlW6j9SR15Rj2.e', 'admin'),
-('Demo User', 'user@example.com', '$2y$10$RBq8IoeWne0aZniCvz13ouGzp.yowoSoU.VVMVWlW6j9SR15Rj2.e', 'user');
+('Admin', 'admin@example.com', 'password', 'admin'),
+('Demo User', 'user@example.com', 'password', 'user');
 
 INSERT INTO students (id, student_id, name, email, phone, course, semester) VALUES
 (1, 'BCA001', 'Rahul Patel', 'rahul@example.com', '9876543210', 'BCA', 6),

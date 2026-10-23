@@ -28,11 +28,9 @@ if (mysqli_num_rows($check) > 0) {
     exit;
 }
 
-$hash = password_hash($password, PASSWORD_BCRYPT);
-
 // every new signup becomes a normal user by default
 $sql = "INSERT INTO users (name, email, password, role)
-        VALUES ('$name', '$email', '$hash', 'user')";
+        VALUES ('$name', '$email', '$password', 'user')";
 
 if (mysqli_query($conn, $sql)) {
 
